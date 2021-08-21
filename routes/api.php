@@ -13,4 +13,22 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::get('posts', 'PostController@index');
+Route::post('login', [
+    'as' => 'login.login',
+    'uses' => 'Api\Auth\LoginController@login'
+]);
+
+Route::get('posts/self', [
+    'as' => 'posts.self',
+    'uses' => 'Api\PostController@self'
+]);
+
+Route::post('posts/create', [
+    'as' => 'posts.store',
+    'uses' => 'Api\PostController@store'
+]);
+
+Route::get('refresh', [
+    'as' => 'login.refresh',
+    'uses' => 'Api\Auth\LoginController@refresh'
+]);

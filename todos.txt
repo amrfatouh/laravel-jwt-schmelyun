@@ -1,0 +1,47 @@
+composer require tymon/jwt-auth 1.0.0
+php artisan vendor:publish --provider="Tymon\JWTAuth\Providers\LaravelServiceProvider"
+change JWT_TTL to 1440 from .env file
+php artisan jwt:secret
+import JWTSubject in User model
+make User model implement JWTSubject
+define getJWTIdentifier, getJWTCustomClaims methods in user model
+change the driver of the api guard in config/auth.php to 'jwt' instead of 'token'
+add Api/Auth/LoginController
+
+define login method in the controller
+copy Controllers/Controller.php into Controllers/Api folder
+in the constructor, set the auth default driver to 'api'
+change the controller that LoginController extends from to be the Controller inside Api folder
+in login() method, take the sent email & password, attempt to create a token and login the user with them
+return the token from the login() method
+if the attempt fails, return an error message to the user
+make a login route whose path is '/login', has a neme of 'login.login' and uses login method from Api\Auth\LoginController
+composer require lcobucci/jwt:3.3.3  (using older version of lcobucci, as the newer makes errors)
+composer update
+
+create Api\PostController.php controller
+append to its namespace '\Api'
+make a get route to '/posts/self' with a name of 'posts.self' and uses the self() method from Api/PostController
+define self() method in Api\PostController
+in self() method, try to get the user, if not found, catch \Tymon\JWTAuth\Exceptions\UserNotDefinedException
+return an the error message inside that exception to the user
+return the user posts if all goes well
+
+create store method in Api\PostController
+get the data sent by the user in the request (title, content of the post)
+try to get the user from auth(), fail if no users
+catch the error and send an error message
+create a new post assigned to the user
+return the created post
+make a route for creating post named 'posts.store', uses 'Api\PostController@store' method
+
+move the piece of code that tries to get a user from auth() and returns an error message if failed to Api\Controller.php in a new function named 'authUser()'
+call the function when needed in Api\PostController
+
+add a new get route to 'refresh' with name 'login.refresh'
+use the Api\Auth\PostController@refresh method 
+define the method in the controller
+invoke refresh() method of auth() that returns a new token
+return the token to the user in json response
+refresh the token in a try and catch block where if failed, return an error message
+it catches an error of type \Tymon\JWTAuth\Exceptions\TokenInvalidException
